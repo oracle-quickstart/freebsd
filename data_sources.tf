@@ -1,19 +1,63 @@
+# ------ Get Network Compartment Name for Policies
+data "oci_identity_compartment" "network_compartment" {
+  id = var.network_compartment_ocid
+}
+
+
+# ------ Get list of availability domains
+data "oci_identity_availability_domains" "ADs" {
+  compartment_id = var.tenancy_ocid
+}
+
+# ------ Get the latest Oracle Linux image
+data "oci_core_images" "InstanceImageOCID" {
+  compartment_id = var.compute_compartment_ocid
+  shape = var.spoke_vm_compute_shape
+
+  filter {
+    name   = "display_name"
+    values = ["^.*Oracle[^G]*$"]
+    regex  = true
+  }
+}
+
+# ------ Get the Oracle Tenancy ID
+data "oci_identity_tenancy" "tenancy" {
+  tenancy_id = var.tenancy_ocid
+}
+
+
+# ------ Get the Tenancy ID and AD Number
 data "oci_identity_availability_domain" "ad" {
   compartment_id = var.tenancy_ocid
   ad_number      = var.availability_domain_number
 }
 
-data "oci_core_images" "autonomous_ol7" {
-  compartment_id   = var.compartment_ocid
-  operating_system = "Oracle Autonomous Linux"
-  sort_by          = "TIMECREATED"
-  sort_order       = "DESC"
-  state            = "AVAILABLE"
+# ------ Get the Tenancy ID and ADs
+data "oci_identity_availability_domains" "ads" {
+  #Required
+  compartment_id = var.tenancy_ocid
+}
 
-  # filter restricts to OL 7
+# ------ Get the Faulte Domain within AD 
+data "oci_identity_fault_domains" "fds" {
+  availability_domain = "${data.oci_identity_availability_domain.ad.name}"
+  compartment_id      = var.compute_compartment_ocid
+
+  depends_on = [
+    data.oci_identity_availability_domain.ad,
+  ]
+}
+
+# ------ Get the Allow All Security Lists for Subnets in Firewall VCN
+data "oci_core_security_lists" "allow_all_security" {
+  compartment_id = var.compute_compartment_ocid
+  vcn_id         = local.use_existing_network ? var.vcn_id : oci_core_vcn.hub.0.id
   filter {
-    name   = "operating_system_version"
-    values = ["7\\.[0-9]"]
-    regex  = true
+    name   = "display_name"
+    values = ["AllowAll"]
   }
+  depends_on = [
+    oci_core_security_list.allow_all_security,
+  ]
 }

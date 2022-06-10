@@ -1,5 +1,4 @@
 #Variables declared in this file must be declared in the marketplace.yaml
-#Provide a description to your variables.
 
 ############################
 #  Hidden Variable Group   #
@@ -10,39 +9,29 @@ variable "tenancy_ocid" {
 variable "region" {
 }
 
-###############################################################################
-#  Marketplace Image Listing - information available in the Partner portal    #
-###############################################################################
+############################
+#  Marketplace Image      #
+############################
+
 variable "mp_subscription_enabled" {
   description = "Subscribe to Marketplace listing?"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "mp_listing_id" {
-  // default = "ocid1.appcataloglisting.oc1.."
-  default     = ""
+  default     = "ocid1.appcataloglisting.oc1..aaaaaaaa52miob5xfolxu32kuxb2jgmdvtdovkisqvr22uozlr2b5cjwjm7a"
   description = "Marketplace Listing OCID"
 }
 
 variable "mp_listing_resource_id" {
-  // default = "ocid1.image.oc1.."
-  default     = ""
+  default     = "ocid1.image.oc1..aaaaaaaayjatgvecms7kciqjx5exbj4dpcs3ympvpggpodwlfuezn7dejdja"
   description = "Marketplace Listing Image OCID"
 }
 
 variable "mp_listing_resource_version" {
-  // default = "1.0"
-  default     = ""
+  default     = "13.1"
   description = "Marketplace Listing Package/Resource Version"
-}
-
-############################
-#  Custom Image           #
-############################
-variable "custom_image_id" {
-  default     = "ocid1.image.oc1...."
-  description = "Custom Image OCID"
 }
 
 ############################
@@ -51,23 +40,41 @@ variable "custom_image_id" {
 
 variable "vm_display_name" {
   description = "Instance Name"
-  default     = "simple-vm"
+  default     = "FreeBSD"
+}
+
+variable "vm_display_name_web" {
+  description = "Instance Name"
+  default     = "web-app"
+}
+
+variable "vm_display_name_db" {
+  description = "Instance Name"
+  default     = "db-app"
 }
 
 variable "vm_compute_shape" {
   description = "Compute Shape"
+  default     = "VM.Standard.A1.Flex" //4 cores
+}
+
+variable "spoke_vm_compute_shape" {
+  description = "Compute Shape"
   default     = "VM.Standard2.2" //2 cores
 }
 
-# only used for E3 Flex shape
 variable "vm_flex_shape_ocpus" {
   description = "Flex Shape OCPUs"
-  default = 1
+  default     = 4
 }
 
+variable "spoke_vm_flex_shape_ocpus" {
+  description = "Spoke VMs Flex Shape OCPUs"
+  default     = 4
+}
 variable "availability_domain_name" {
   default     = ""
-  description = "Availability Domain name, if non-empty takes precedence over availability_domain_number"
+  description = "Availability Domain"
 }
 
 variable "availability_domain_number" {
@@ -76,12 +83,12 @@ variable "availability_domain_number" {
 }
 
 variable "ssh_public_key" {
-  description = "SSH Public Key"
+  description = "SSH Public Key String"
 }
 
-variable "hostname_label" {
-  default     = "simple"
-  description = "DNS Hostname Label. Must be unique across all VNICs in the subnet and comply with RFC 952 and RFC 1123."
+variable "instance_launch_options_network_type" {
+  description = "NIC Attachment Type"
+  default     = "PARAVIRTUALIZED"
 }
 
 ############################
@@ -89,7 +96,6 @@ variable "hostname_label" {
 ############################
 
 variable "network_strategy" {
-  #default = "Use Existing VCN and Subnet"
   default = "Create New VCN and Subnet"
 }
 
@@ -97,96 +103,286 @@ variable "vcn_id" {
   default = ""
 }
 
+variable "web_vcn_id" {
+  default = ""
+}
+
+
+variable "db_vcn_id" {
+  default = ""
+}
+
+
 variable "vcn_display_name" {
   description = "VCN Name"
-  default     = "simple-vcn"
+  default     = "firewall-vcn"
 }
 
 variable "vcn_cidr_block" {
   description = "VCN CIDR"
-  default     = "10.0.0.0/16"
+  default     = "192.168.0.0/16"
 }
 
 variable "vcn_dns_label" {
   description = "VCN DNS Label"
-  default     = "simplevcn"
+  default     = "ha"
 }
 
-variable "subnet_type" {
-  description = "Choose between private and public subnets"
-  default     = "Public Subnet"
-  #or
-  #default     = "Private Subnet"
+variable "subnet_span" {
+  description = "Choose between regional and AD specific subnets"
+  default     = "Regional Subnet"
 }
 
-variable "subnet_id" {
+variable "mangement_subnet_id" {
   default = ""
 }
 
-variable "subnet_display_name" {
-  description = "Subnet Name"
-  default     = "simple-subnet"
+variable "mangement_subnet_display_name" {
+  description = "Management Subnet Name"
+  default     = "management-subnet"
 }
 
-variable "subnet_cidr_block" {
-  description = "Subnet CIDR"
+variable "mangement_subnet_cidr_block" {
+  description = "Management Subnet CIDR"
+  default     = "192.168.0.0/24"
+}
+
+variable "mangement_subnet_dns_label" {
+  description = "Management Subnet DNS Label"
+  default     = "management"
+}
+
+variable "trust_subnet_id" {
+  default = ""
+}
+
+variable "trust_subnet_display_name" {
+  description = "Trust Subnet Name"
+  default     = "trust-subnet"
+}
+
+variable "trust_subnet_cidr_block" {
+  description = "Trust Subnet CIDR"
+  default     = "192.168.2.0/24"
+}
+
+variable "trust_subnet_dns_label" {
+  description = "Trust Subnet DNS Label"
+  default     = "trust"
+}
+
+variable "untrust_subnet_id" {
+  default = ""
+}
+
+variable "untrust_subnet_display_name" {
+  description = "PAN Untrust Subnet Name"
+  default     = "untrust-subnet"
+}
+
+variable "untrust_subnet_cidr_block" {
+  description = "PAN Untrust Subnet CIDR"
+  default     = "192.168.1.0/24"
+}
+
+variable "untrust_subnet_dns_label" {
+  description = "Untrust Subnet DNS Label"
+  default     = "untrust"
+}
+
+variable "nlb_subnet_id" {
+  default = ""
+}
+
+variable "nlb_subnet_display_name" {
+  description = "NLB Subnet Name"
+  default     = "nlb-subnet"
+}
+
+variable "nlb_subnet_cidr_block" {
+  description = "NLB Subnet CIDR"
+  default     = "192.168.30.0/24"
+}
+
+variable "nlb_subnet_dns_label" {
+  description = "NLB Subnet DNS Label"
+  default     = "NLB"
+}
+
+variable "web_vcn_cidr_block" {
+  description = "Web Spoke VCN CIDR Block"
   default     = "10.0.0.0/24"
 }
 
-variable "subnet_dns_label" {
-  description = "Subnet DNS Label"
-  default     = "simplesubnet"
+variable "web_vcn_dns_label" {
+  description = "Web Spoke VCN DNS Label"
+  default     = "web"
 }
 
-############################
-# Security Configuration #
-############################
-variable "nsg_display_name" {
-  description = "Network Security Group Name"
-  default     = "simple-network-security-group"
+variable "web_vcn_display_name" {
+  description = "Web Spoke VCN Display Name"
+  default     = "web-vcn"
 }
 
-variable "nsg_source_cidr" {
-  description = "Allowed Ingress Traffic (CIDR Block)"
-  default     = "0.0.0.0/0"
+variable "web_transit_subnet_id" {
+  default = ""
 }
 
-variable "nsg_ssh_port" {
-  description = "SSH Port"
-  default     = 22
+variable "web_transit_subnet_cidr_block" {
+  description = "Web Spoke VCN Private Subnet"
+  default     = "10.0.0.0/25"
 }
 
-variable "nsg_https_port" {
-  description = "HTTPS Port"
-  default     = 443
+variable "web_transit_subnet_display_name" {
+  description = "Web Spoke VCN Private Subnet Display Name"
+  default     = "web_private-subnet"
 }
 
-variable "nsg_http_port" {
-  description = "HTTP Port"
+variable "web_transit_subnet_dns_label" {
+  description = "Web Spoke VCN DNS Label"
+  default     = "webtransit"
+}
+
+variable "web_lb_subnet_id" {
+  default = ""
+}
+
+variable "web_lb_subnet_cidr_block" {
+  description = "Web Spoke VCN Loadbalancer Subnet"
+  default     = "10.0.0.128/25"
+}
+
+variable "web_lb_subnet_display_name" {
+  description = "Web Spoke VCN LB Subnet Display Name"
+  default     = "web_lb-subnet"
+}
+
+variable "web_lb_subnet_dns_label" {
+  description = "Web Spoke VCN DNS Label"
+  default     = "weblb"
+}
+
+variable "backend_port" {
+  description = "Web Load Balancer Backend Port"
   default     = 80
+}
+
+variable "db_vcn_cidr_block" {
+  description = "DB Spoke VCN CIDR Block"
+  default     = "10.0.1.0/24"
+}
+
+variable "db_vcn_dns_label" {
+  description = "DB Spoke VCN DNS Label"
+  default     = "db"
+}
+
+variable "db_vcn_display_name" {
+  description = "DB Spoke VCN Display Name"
+  default     = "db-vcn"
+}
+
+variable "db_transit_subnet_id" {
+  default = ""
+}
+
+variable "db_transit_subnet_cidr_block" {
+  description = "DB Spoke VCN Private Subnet"
+  default     = "10.0.1.0/25"
+}
+
+variable "db_transit_subnet_display_name" {
+  description = "DB Spoke VCN Private Subnet Display Name"
+  default     = "db_private-subnet"
+}
+
+variable "db_transit_subnet_dns_label" {
+  description = "Web Spoke VCN DNS Label"
+  default     = "dbtransit"
 }
 
 ############################
 # Additional Configuration #
 ############################
 
-variable "compartment_ocid" {
+variable "compute_compartment_ocid" {
   description = "Compartment where Compute and Marketplace subscription resources will be created"
 }
 
-variable "tag_key_name" {
-  description = "Free-form tag key name"
-  default     = "oracle-quickstart"
+variable "network_compartment_ocid" {
+  description = "Compartment where Network resources will be created"
 }
 
-variable "tag_value" {
-  description = "Free-form tag value"
-  default     = "oci-quickstart-template"
+variable "nsg_whitelist_ip" {
+  description = "Network Security Groups - Whitelisted CIDR block for ingress communication: Enter 0.0.0.0/0 or <your IP>/32"
+  default     = "0.0.0.0/0"
 }
 
+variable "nsg_display_name" {
+  description = "Network Security Groups - Name"
+  default     = "cluster-security-group"
+}
+
+variable "web_nsg_display_name" {
+  description = "Network Security Groups - Web"
+  default     = "web-security-group"
+}
+
+variable "db_nsg_display_name" {
+  description = "Network Security Groups - App"
+  default     = "db-security-group"
+}
+
+
+variable "public_routetable_display_name" {
+  description = "Public route table Name"
+  default     = "UntrustRouteTable"
+}
+
+variable "private_routetable_display_name" {
+  description = "Private route table Name"
+  default     = "TrustRouteTable"
+}
+
+
+variable "nlb_routetable_display_name" {
+  description = "Private route table Name"
+  default     = "NLBRouteTable"
+}
+
+
+variable "lpg_routetable_display_name" {
+  description = "LPG route table Name"
+  default     = "LPGRouteTable"
+}
+
+variable "drg_routetable_display_name" {
+  description = "DRG route table Name"
+  default     = "DRGRouteTable"
+}
+
+variable "sgw_routetable_display_name" {
+  description = "SGW route table Name"
+  default     = "SGWRouteTable"
+}
+
+variable "use_existing_ip" {
+  description = "Use an existing permanent public ip"
+  default     = "Create new IP"
+}
+
+variable "template_name" {
+  description = "Template name. Should be defined according to deployment type"
+  default     = "ha"
+}
+
+variable "template_version" {
+  description = "Template version"
+  default     = "20200724"
+}
 
 ######################
-#    Enum Values     #
+#    Enum Values     #   
 ######################
 variable "network_strategy_enum" {
   type = map
@@ -199,8 +395,8 @@ variable "network_strategy_enum" {
 variable "subnet_type_enum" {
   type = map
   default = {
-    PRIVATE_SUBNET = "Private Subnet"
-    PUBLIC_SUBNET  = "Public Subnet"
+    transit_subnet    = "Private Subnet"
+    MANAGEMENT_SUBENT = "Public Subnet"
   }
 }
 
