@@ -1,4 +1,10 @@
+terraform {
+  required_version = ">= 0.12.0"
+}
+
+# ------ Assign OCI Provider
 provider "oci" {
+  version          = ">= 3.0.0"
   tenancy_ocid     = var.tenancy_ocid
   user_ocid        = var.user_ocid
   fingerprint      = var.fingerprint
